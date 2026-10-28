@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plano de Treino 6 Semanas - Bruno Macedo</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            900: '#14532d',
+                        },
+                        darkbg: '#0f172a',
+                        carddark: '#1e293b'
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 9999px; }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col pb-12 transition-colors duration-300 relative">
+
+    <!-- Toast de Notificação Motivacional -->
+    <div id="toastNotification" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-500 ease-out max-w-sm w-full bg-gradient-to-r from-emerald-600 to-teal-700 text-white p-4 rounded-2xl shadow-2xl border border-emerald-400/40 flex items-start gap-3 pointer-events-none">
+        <div class="p-2 bg-white/20 rounded-xl shrink-0 text-xl">
+            <i id="toastIcon" class="ph ph-trophy"></i>
+        </div>
+        <div>
+            <h4 id="toastTitle" class="font-bold text-sm leading-tight">Excelente Trabalho!</h4>
+            <p id="toastMessage" class="text-xs opacity-90 mt-1">Sua constância hoje garante sua saúde de amanhã.</p>
+        </div>
+    </div>
+
+    <!-- Header / Navbar Topo -->
+    <header class="border-b border-slate-800 bg-slate-900/80 sticky top-0 z-30 backdrop-blur-md">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-xl border border-emerald-500/30">
+                    BM
+                </div>
+                <div>
+                    <h1 class="font-bold text-slate-100 text-base sm:text-lg leading-tight">Bruno de Campos Macedo</h1>
+                    <p class="text-xs text-slate-400">28 anos • Treino 6 Semanas (Início: 28/10/2026)</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-2">
+                <button id="resetWorkoutBtn" title="Resetar Progresso Salvo" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium transition flex items-center gap-1.5 border border-slate-700">
+                    <i class="ph ph-arrows-counter-clockwise text-sm"></i>
+                    <span class="hidden sm:inline">Limpar Registro</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Banner Motivacional Dinâmico do Dia -->
+    <section class="max-w-6xl mx-auto px-4 pt-4 w-full">
+        <div class="bg-gradient-to-r from-emerald-950/60 via-slate-900 to-indigo-950/60 border border-emerald-500/30 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-lg">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-xl shrink-0 border border-amber-500/30">
+                    <i class="ph ph-lightning"></i>
+                </div>
+                <div>
+                    <span class="text-[10px] uppercase font-extrabold tracking-wider text-amber-400 block">Dica & Motivação Diária</span>
+                    <p id="dailyQuoteText" class="text-xs sm:text-sm font-semibold text-slate-100 italic">
+                        "A constância nos 20 minutos vale mais que 2 horas um único dia. Foco no processo, Bruno!"
+                    </p>
+                </div>
+            </div>
+            <button onclick="generateRandomQuote()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-amber-300 hover:text-amber-200 text-xs font-semibold rounded-xl border border-amber-500/30 transition shrink-0 flex items-center gap-1.5">
+                <i class="ph ph-shuffle"></i> Nova Frase
+            </button>
+        </div>
+    </section>
+
+    <!-- Main Container -->
+    <main class="max-w-6xl mx-auto px-4 pt-4 flex-grow w-full space-y-6">
+
+        <!-- Banner Ciclo das 6 Semanas -->
+        <section class="bg-gradient-to-r from-slate-900 via-slate-900 to-emerald-950/40 rounded-2xl p-4 md:p-5 border border-slate-800 relative overflow-hidden">
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                <div>
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="px-2.5 py-0.5 bg-emerald-500/20 text-emerald-400 text-xs font-bold rounded-md border border-emerald-500/30">FASE 1: ADAPTAÇÃO & PROTEÇÃO LOMBAR</span>
+                        <span id="cycleWeekBadge" class="px-2.5 py-0.5 bg-indigo-500/20 text-indigo-300 text-xs font-semibold rounded-md border border-indigo-500/30">Semana 1 de 6</span>
+                    </div>
+                    <h2 class="text-xl font-extrabold text-slate-100">Ciclo 6 Semanas (28/10/2026 a 09/12/2026)</h2>
+                    <p class="text-xs text-slate-400 mt-1">Ao final de 6 semanas, um código de reavaliação será liberado para solicitar a montagem do próximo treino.</p>
+                    <p class="text-xs text-emerald-400/90 font-medium mt-1.5 flex items-center gap-1">
+                        <i class="ph ph-sparkle text-amber-400"></i> "Cada sessão concluída neste ciclo é um tijolo na reconstrução da sua saúde."
+                    </p>
+                </div>
+
+                <div class="bg-slate-950/80 p-3 rounded-xl border border-slate-800 min-w-[240px]">
+                    <div class="flex justify-between items-center text-xs mb-1.5">
+                        <span class="text-slate-400">Progresso do Ciclo</span>
+                        <span id="cycleProgressPercent" class="font-bold text-emerald-400">0%</span>
+                    </div>
+                    <div class="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden">
+                        <div id="cycleProgressBar" class="bg-emerald-500 h-full rounded-full transition-all duration-500" style="width: 0%;"></div>
+                    </div>
+                    <p id="cycleDaysText" class="text-[10px] text-slate-400 mt-1.5 text-right">0 de 42 dias passados</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Banner Dashboard de Metas -->
+        <section class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+            <!-- Meta Peso -->
+            <div class="bg-slate-900/90 rounded-2xl p-4 border border-slate-800 relative overflow-hidden group hover:border-emerald-500/40 transition">
+                <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Objetivo de Peso</p>
+                <div class="mt-2 flex items-baseline gap-2">
+                    <span class="text-2xl font-black text-white">110kg</span>
+                    <i style="margin-left: -5px;" class="ph ph-arrow-right text-emerald-400 text-sm"></i>
+                    <span style="margin-left: -5px;" class="text-2xl font-black text-emerald-400">83kg</span>
+                </div>
+                <p class="text-[10px] text-slate-400 mt-1">Foco: Perda de Peso Sustentável</p>
+            </div>
+
+            <!-- Frequência -->
+            <div class="bg-slate-900/90 rounded-2xl p-4 border border-slate-800 relative overflow-hidden group hover:border-emerald-500/40 transition">
+                <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Frequência</p>
+                <p class="text-2xl font-black text-white mt-2">3x <span class="text-xs font-normal text-slate-400">/ semana</span></p>
+                <p class="text-xs text-emerald-400 font-medium mt-1">Segunda • Quarta • Sexta</p>
+            </div>
+
+            <!-- Duração Sessão -->
+            <div class="bg-slate-900/90 rounded-2xl p-4 border border-slate-800 relative overflow-hidden group hover:border-emerald-500/40 transition">
+                <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Sessão Rápida</p>
+                <p class="text-2xl font-black text-white mt-2">20 <span class="text-xs font-normal text-slate-400">Minutos</span></p>
+                <p class="text-xs text-slate-400 mt-1">Treino Em Casa Completo</p>
+            </div>
+
+            <!-- Foco em Proteção -->
+            <div class="bg-slate-900/90 rounded-2xl p-4 border border-slate-800 relative overflow-hidden group hover:border-emerald-500/40 transition">
+                <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Foco Prioritário</p>
+                <p class="text-lg font-bold text-amber-400 mt-2 flex items-center gap-1.5">
+                    <i class="ph ph-shield-check"></i> Proteção Lombar
+                </p>
+                <p class="text-xs text-slate-400 mt-1">Sem sobrecarga na coluna</p>
+            </div>
+        </section>
+
+        <!-- Alerta Secreto de Fim de Ciclo (Exibido após 6 semanas) -->
+        <section id="reevaluationBanner" class="hidden bg-gradient-to-r from-amber-950/80 via-slate-900 to-amber-950/80 rounded-2xl p-5 border-2 border-amber-500/60 text-center space-y-3 shadow-2xl">
+            <div class="inline-flex items-center justify-center w-12 h-12 bg-amber-500/20 text-amber-400 rounded-2xl text-2xl border border-amber-500/30">
+                <i class="ph ph-lock-key-open"></i>
+            </div>
+            <div>
+                <span class="px-3 py-1 bg-amber-500/20 text-amber-300 text-xs font-bold rounded-full border border-amber-500/40 uppercase tracking-wider">Prazo de 6 Semanas Concluído</span>
+                <h3 class="text-xl font-black text-white mt-2">Hora de Solicitar seu Novo Treino!</h3>
+                <p class="text-xs text-slate-300 max-w-xl mx-auto mt-1">
+                    Parabéns, Bruno! Você concluiu o ciclo inicial de 6 semanas de adaptação e proteção lombar. Envie o código abaixo para o seu personal para liberar o novo treino do próximo ciclo.
+                </p>
+            </div>
+            <div class="bg-slate-950 p-3 rounded-xl border border-amber-500/40 max-w-md mx-auto flex items-center justify-between">
+                <span class="text-xs text-slate-400">Código de Liberação:</span>
+                <code id="secretCodeText" class="text-base font-mono font-bold text-amber-400 select-all">REAVALIAR-BRUNO-6SEM</code>
+            </div>
+        </section>
+
+        <!-- Seção do Cronômetro de Sessão e Rest Timer -->
+        <section class="bg-slate-900 rounded-2xl p-4 md:p-6 border border-slate-800 shadow-xl">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+                <!-- Session Timer -->
+                <div class="flex items-center gap-4 w-full md:w-auto justify-between md:justify-start">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-2xl border border-emerald-500/20">
+                            <i class="ph ph-hourglass-medium"></i>
+                        </div>
+                        <div>
+                            <span class="text-xs text-slate-400 block font-semibold uppercase">Tempo de Sessão (20 min)</span>
+                            <span id="sessionTimerDisplay" class="text-3xl font-black font-mono tracking-wider text-slate-100">20:00</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button id="startSessionBtn" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-medium text-sm flex items-center gap-1.5 transition shadow-lg shadow-emerald-900/20">
+                            <i class="ph ph-play text-base"></i> Iniciar
+                        </button>
+                        <button id="pauseSessionBtn" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl font-medium text-sm transition hidden">
+                            <i class="ph ph-pause text-base"></i> Pausar
+                        </button>
+                        <button id="resetSessionBtn" class="p-2 text-slate-400 hover:text-slate-200 rounded-xl hover:bg-slate-800 transition">
+                            <i class="ph ph-arrow-counter-clockwise text-lg"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="w-full md:w-px h-px md:h-12 bg-slate-800"></div>
+
+                <!-- Rest Timer -->
+                <div class="flex items-center gap-4 w-full md:w-auto justify-between md:justify-start">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-2xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center text-2xl border border-indigo-500/20">
+                            <i class="ph ph-hourglass-medium"></i>
+                        </div>
+                        <div>
+                            <span class="text-xs text-slate-400 block font-semibold uppercase">Timer de Descanso</span>
+                            <span id="restTimerDisplay" class="text-3xl font-black font-mono tracking-wider text-indigo-400">00:45</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button id="startRest45Btn" class="px-3 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-semibold text-xs transition">
+                            45 seg
+                        </button>
+                        <button id="startRest30Btn" class="px-3 py-2 bg-slate-800 hover:bg-indigo-900/50 hover:text-indigo-300 text-slate-300 rounded-xl font-semibold text-xs border border-slate-700 transition">
+                            30 seg
+                        </button>
+                        <button id="resetRestBtn" class="p-2 text-slate-400 hover:text-slate-200 rounded-xl hover:bg-slate-800 transition">
+                            <i class="ph ph-x text-lg"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Navegação por Abas -->
+        <div class="border-b border-slate-800 flex space-x-2 md:space-x-4 overflow-x-auto custom-scrollbar pb-1">
+            <button class="tab-btn active px-4 py-3 text-sm font-semibold border-b-2 transition flex items-center gap-2 whitespace-nowrap text-emerald-400 border-emerald-500" data-tab="treinoA">
+                <i class="ph ph-bold ph-barbell"></i> Treino A (Segunda)
+            </button>
+            <button class="tab-btn px-4 py-3 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition flex items-center gap-2 whitespace-nowrap" data-tab="treinoB">
+                <i class="ph ph-bold ph-heartbeat"></i> Treino B (Quarta)
+            </button>
+            <button class="tab-btn px-4 py-3 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition flex items-center gap-2 whitespace-nowrap" data-tab="treinoC">
+                <i class="ph ph-bold ph-person-simple-run"></i> Treino C (Sexta)
+            </button>
+            <button class="tab-btn px-4 py-3 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition flex items-center gap-2 whitespace-nowrap" data-tab="historico">
+                <i class="ph ph-bold ph-calendar-check"></i> Histórico & Registro
+            </button>
+        </div>
+
+        <!-- Conteúdo das Abas -->
+        <div id="tabContents">
+            
+            <!-- TREINO A -->
+            <div id="treinoA" class="tab-content space-y-4">
+                <div class="bg-gradient-to-r from-slate-900 to-emerald-950/40 p-4 rounded-2xl border border-emerald-900/30 flex items-center justify-between">
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-100">TREINO A: Peito, Ombro & Tríceps</h2>
+                        <p class="text-xs text-slate-400">Cadeia de empurrar • Fortalecimento com suporte para a lombar</p>
+                    </div>
+                    <button onclick="logTodayWorkout('Treino A - Peito, Ombro & Tríceps')" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-semibold transition flex items-center gap-1">
+                        <i class="ph ph-check-circle"></i> Concluir Treino de Hoje
+                    </button>
+                </div>
+
+                <div class="grid md:grid-cols-3 gap-4" id="cardsA"></div>
+            </div>
+
+            <!-- TREINO B -->
+            <div id="treinoB" class="tab-content space-y-4 hidden">
+                <div class="bg-gradient-to-r from-slate-900 to-indigo-950/40 p-4 rounded-2xl border border-indigo-900/30 flex items-center justify-between">
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-100">TREINO B: Costas, Bíceps & Core</h2>
+                        <p class="text-xs text-slate-400">Cadeia de puxar • Postura de trabalho e alívio nas costas</p>
+                    </div>
+                    <button onclick="logTodayWorkout('Treino B - Costas, Bíceps & Core')" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold transition flex items-center gap-1">
+                        <i class="ph ph-check-circle"></i> Concluir Treino de Hoje
+                    </button>
+                </div>
+
+                <div class="grid md:grid-cols-3 gap-4" id="cardsB"></div>
+            </div>
+
+            <!-- TREINO C -->
+            <div id="treinoC" class="tab-content space-y-4 hidden">
+                <div class="bg-gradient-to-r from-slate-900 to-amber-950/40 p-4 rounded-2xl border border-amber-900/30 flex items-center justify-between">
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-100">TREINO C: Inferiores Completo & Mobilidade</h2>
+                        <p class="text-xs text-slate-400">Pernas e coluna • Equipamentos Shopee + Colchonete</p>
+                    </div>
+                    <button onclick="logTodayWorkout('Treino C - Inferiores & Mobilidade')" class="px-3 py-1.5 bg-amber-600 hover:bg-amber-500 text-white rounded-xl text-xs font-semibold transition flex items-center gap-1">
+                        <i class="ph ph-check-circle"></i> Concluir Treino de Hoje
+                    </button>
+                </div>
+
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4" id="cardsC"></div>
+            </div>
+
+            <!-- HISTÓRICO & LOCALSTORAGE -->
+            <div id="historico" class="tab-content space-y-4 hidden">
+                <div class="bg-slate-900 p-5 rounded-2xl border border-slate-800">
+                    <h2 class="text-lg font-bold text-slate-100 mb-1">Histórico de Sessões Concluídas</h2>
+                    <p class="text-xs text-slate-400">Todo o seu progresso é salvo no seu próprio navegador usando <code class="text-emerald-400">localStorage</code> (sem necessidade de banco de dados ou PHP).</p>
+                </div>
+
+                <div class="bg-slate-900 rounded-2xl p-5 border border-slate-800 space-y-3">
+                    <h3 class="text-sm font-bold text-slate-200">Registro de Atividades</h3>
+                    <div id="workoutHistoryList" class="space-y-2 text-xs">
+                        <!-- Preenchido via JS -->
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Modal de Vídeo Incorporado -->
+    <div id="videoModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden max-w-3xl w-full shadow-2xl flex flex-col">
+            <div class="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-900">
+                <div class="flex items-center gap-2">
+                    <i class="ph ph-youtube-logo text-red-500 text-2xl"></i>
+                    <h3 id="modalVideoTitle" class="font-bold text-slate-100 text-base">Demonstração do Exercício</h3>
+                </div>
+                <button id="closeModalBtn" class="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition">
+                    <i class="ph ph-x text-xl"></i>
+                </button>
+            </div>
+
+            <div class="relative w-full aspect-video bg-black flex items-center justify-center">
+                <iframe id="youtubeIframe" class="w-full h-full" src="" title="Demonstração do Exercício" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+
+            <div class="p-4 bg-slate-900 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3">
+                <p id="modalInstruction" class="text-xs text-slate-400 text-center sm:text-left">
+                    Siga a postura recomendada para proteger sua lombar.
+                </p>
+                <a id="youtubeExternalLink" href="#" target="_blank" class="text-xs text-emerald-400 hover:underline flex items-center gap-1 shrink-0">
+                    Abrir no YouTube <i class="ph ph-arrow-square-out"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script Principal -->
+    <script>
+        // Lista de Frases Motivacionais & Dicas Práticas
+        const quotesAndTips = [
+            "A constância nos 20 minutos vale mais que 2 horas um único dia. Foco no processo, Bruno!",
+            "Proteja sua coluna hoje para ter liberdade de movimento amanhã.",
+            "Não busque perfeição, busque execução. 20 minutos bem feitos mudam seu dia!",
+            "Cada repetição bem feita fortalece sua lombar e acelera sua perda de peso.",
+            "Com 110kg você movimenta uma carga expressiva. Respeite as articulações e mantenha o ritmo!",
+            "A disciplina constrói o corpo que a motivação apenas deseja.",
+            "Se você cansar, aprenda a descansar a lombar, não a desistir do treino.",
+            "Seus 83kg estão sendo construídos a cada segunda, quarta e sexta!",
+            "Dica de Ouro: Mantenha o abdômen contraído em todos os exercícios para blindar a coluna."
+        ];
+
+        function generateRandomQuote() {
+            const randomIndex = Math.floor(Math.random() * quotesAndTips.length);
+            document.getElementById('dailyQuoteText').innerText = `"${quotesAndTips[randomIndex]}"`;
+        }
+
+        // Exibir Toast de Notificação Motivacional
+        function showToast(title, message, iconClass = 'ph-trophy') {
+            const toast = document.getElementById('toastNotification');
+            document.getElementById('toastTitle').innerText = title;
+            document.getElementById('toastMessage').innerText = message;
+            document.getElementById('toastIcon').className = `ph ${iconClass}`;
+
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 4500);
+        }
+
+        // Configurações e Datas das 6 Semanas
+        const START_DATE = new Date('2026-10-28T00:00:00'); // Quarta-feira, 28/10/2026
+        const TOTAL_DAYS = 42; // 6 semanas * 7 dias
+        const END_DATE = new Date(START_DATE.getTime() + (TOTAL_DAYS * 24 * 60 * 60 * 1000));
+
+        // Dados dos Treinos
+        const workoutData = {
+            treinoA: [
+                {
+                    id: 'ex_a1',
+                    title: '1. Supino Reto no Solo',
+                    equipment: 'Halteres / Barra + Colchonete',
+                    sets: '3 séries',
+                    reps: '10 a 12 reps',
+                    rest: '45 seg',
+                    instructions: 'Deitado no colchonete, empurre o peso na linha do peito. Costas totalmente apoiadas no chão.',
+                    videoId: 'vthMCtgVtA4',
+                    youtubeQuery: 'supino+reto+com+halteres+no+solo'
+                },
+                {
+                    id: 'ex_a2',
+                    title: '2. Desenvolvimento de Ombros',
+                    equipment: 'Halteres (Sentado)',
+                    sets: '3 séries',
+                    reps: '10 reps',
+                    rest: '45 seg',
+                    instructions: 'Sentado na ponta de uma cadeira firme, empurre os halteres para cima. Evite arquear a lombar.',
+                    videoId: 'B-4q308A56s',
+                    youtubeQuery: 'desenvolvimento+ombros+halteres+sentado'
+                },
+                {
+                    id: 'ex_a3',
+                    title: '3. Tríceps Testa no Colchonete',
+                    equipment: 'Halteres + Colchonete',
+                    sets: '3 séries',
+                    reps: '12 reps',
+                    rest: '45 seg',
+                    instructions: 'Deitado de costas, flexione apenas os cotovelos trazendo os pesos na lateral da cabeça.',
+                    videoId: 'nRiJVZDpdL0',
+                    youtubeQuery: 'triceps+testa+com+halteres+no+chao'
+                }
+            ],
+            treinoB: [
+                {
+                    id: 'ex_b1',
+                    title: '1. Remada Curvada / Apoiada',
+                    equipment: 'Halteres ou Barra',
+                    sets: '3 séries',
+                    reps: '10 reps',
+                    rest: '45 seg',
+                    instructions: 'Puxe o peso trazendo os cotovelos rentes ao tronco. Apoie o tronco no banco/móvel se a lombar cansar.',
+                    videoId: 'vkKCVCze4XA',
+                    youtubeQuery: 'remada+curvada+halteres'
+                },
+                {
+                    id: 'ex_b2',
+                    title: '2. Rosca Direta de Bíceps',
+                    equipment: 'Halteres ou Barra',
+                    sets: '3 séries',
+                    reps: '10 reps',
+                    rest: '45 seg',
+                    instructions: 'Sentado ou em pé, puxe os pesos direcionados aos ombros. Não use o balanço do corpo.',
+                    videoId: 'in7PaeYlhrM',
+                    youtubeQuery: 'rosca+direta+halteres'
+                },
+                {
+                    id: 'ex_b3',
+                    title: '3. Prancha Abdominal nos Joelhos',
+                    equipment: 'Colchonete',
+                    sets: '3 séries',
+                    reps: '20 a 30 seg',
+                    rest: '45 seg',
+                    instructions: 'Apoie cotovelos e joelhos no solo, umbigo para dentro. Fortalece o cinturão abdominal.',
+                    videoId: 'TvxNkmjdhMM',
+                    youtubeQuery: 'prancha+com+joelhos+apoiados'
+                }
+            ],
+            treinoC: [
+                {
+                    id: 'ex_c1',
+                    title: '1. Mobilidade Gato-Vaca',
+                    equipment: 'Colchonete',
+                    sets: '2 séries',
+                    reps: '10 reps',
+                    rest: '30 seg',
+                    instructions: 'Alterne suavemente entre arquear e afundar a coluna no solo.',
+                    videoId: 'w_UKcI1F21Y',
+                    youtubeQuery: 'exercicio+gato+vaca+mobilidade'
+                },
+                {
+                    id: 'ex_c2',
+                    title: '2. Extensão de Joelhos',
+                    equipment: 'Cadeira/Mesa Extensora',
+                    sets: '3 séries',
+                    reps: '12 reps',
+                    rest: '45 seg',
+                    instructions: 'Sentado firme, estenda as pernas focando na coxa anterior.',
+                    videoId: 'y_XpX_K9t3k',
+                    youtubeQuery: 'cadeira+extensora+execucao'
+                },
+                {
+                    id: 'ex_c3',
+                    title: '3. Flexão de Pernas',
+                    equipment: 'Cadeira/Mesa Flexora',
+                    sets: '3 séries',
+                    reps: '12 reps',
+                    rest: '45 seg',
+                    instructions: 'Puxe a carga com a parte de trás da coxa de forma suave.',
+                    videoId: '0G2_XV7slvk',
+                    youtubeQuery: 'mesa+flexora+execucao'
+                },
+                {
+                    id: 'ex_c4',
+                    title: '4. Agachamento Controlado na Cadeira',
+                    equipment: 'Cadeira Firme',
+                    sets: '3 séries',
+                    reps: '10 reps',
+                    rest: '45 seg',
+                    instructions: 'Sente e levante de uma cadeira usando apenas as pernas. Seguro para os joelhos.',
+                    videoId: 'aclHkVaku9U',
+                    youtubeQuery: 'agachamento+com+cadeira+execucao'
+                }
+            ]
+        };
+
+        // Estado do App via LocalStorage
+        let completedExercises = JSON.parse(localStorage.getItem('bruno_completed_ex')) || {};
+        let exerciseWeights = JSON.parse(localStorage.getItem('bruno_weights')) || {};
+        let workoutHistory = JSON.parse(localStorage.getItem('bruno_history')) || [];
+
+        // Atualizar Cálculos de Tempo do Ciclo
+        function updateCycleProgress() {
+            const now = new Date();
+            const diffTime = now - START_DATE;
+            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+            
+            let daysPassed = Math.max(0, Math.min(TOTAL_DAYS, diffDays));
+            let percentage = Math.round((daysPassed / TOTAL_DAYS) * 100);
+            let currentWeek = Math.min(6, Math.floor(daysPassed / 7) + 1);
+
+            document.getElementById('cycleProgressBar').style.width = `${percentage}%`;
+            document.getElementById('cycleProgressPercent').innerText = `${percentage}%`;
+            document.getElementById('cycleDaysText').innerText = `${daysPassed} de ${TOTAL_DAYS} dias passados`;
+            document.getElementById('cycleWeekBadge').innerText = `Semana ${currentWeek} de 6`;
+
+            // Verificar se o ciclo terminou para ativar o aviso com o código secreto
+            if (now >= END_DATE || daysPassed >= TOTAL_DAYS) {
+                document.getElementById('reevaluationBanner').classList.remove('hidden');
+            }
+        }
+
+        // Renderizar Cards dos Exercícios com Salvamento de Carga
+        function renderCards() {
+            ['treinoA', 'treinoB', 'treinoC'].forEach(key => {
+                const container = document.getElementById(key === 'treinoA' ? 'cardsA' : key === 'treinoB' ? 'cardsB' : 'cardsC');
+                if (!container) return;
+
+                container.innerHTML = workoutData[key].map(ex => {
+                    const isDone = completedExercises[ex.id] || false;
+                    const savedWeight = exerciseWeights[ex.id] || '';
+
+                    return `
+                        <div class="bg-slate-900 rounded-2xl p-4 border ${isDone ? 'border-emerald-500/50 bg-emerald-950/10' : 'border-slate-800'} flex flex-col justify-between transition-all group">
+                            <div>
+                                <div class="flex items-start justify-between gap-2 mb-3">
+                                    <h3 class="font-bold text-slate-100 text-sm flex-1 leading-snug">${ex.title}</h3>
+                                    <button onclick="toggleDone('${ex.id}')" title="Marcar como concluído" class="shrink-0 w-8 h-8 rounded-xl flex items-center justify-center transition ${isDone ? 'bg-emerald-500 text-slate-950 font-bold' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}">
+                                        <i class="ph ph-${isDone ? 'check-bold' : 'square'} text-base"></i>
+                                    </button>
+                                </div>
+
+                                <div class="flex items-center gap-1.5 text-[11px] text-slate-400 mb-3 bg-slate-950/60 px-2.5 py-1.5 rounded-lg border border-slate-800/80">
+                                    <i class="ph ph-barbell text-emerald-400"></i>
+                                    <span class="truncate">${ex.equipment}</span>
+                                </div>
+
+                                <div class="flex flex-wrap gap-1.5 mb-3">
+                                    <span class="px-2 py-0.5 bg-slate-800 text-slate-300 text-[11px] font-semibold rounded-md border border-slate-700">${ex.sets}</span>
+                                    <span class="px-2 py-0.5 bg-emerald-500/10 text-emerald-400 text-[11px] font-semibold rounded-md border border-emerald-500/20">${ex.reps}</span>
+                                    <span class="px-2 py-0.5 bg-indigo-500/10 text-indigo-400 text-[11px] font-semibold rounded-md border border-indigo-500/20"><i class="ph ph-clock text-[10px]"></i> ${ex.rest}</span>
+                                </div>
+
+                                <!-- Input de Carga -->
+                                <div class="mb-3 flex items-center gap-2 bg-slate-950/40 p-2 rounded-xl border border-slate-800">
+                                    <span class="text-[11px] text-slate-400 font-medium">Carga (kg):</span>
+                                    <input type="text" placeholder="Ex: 10kg" value="${savedWeight}" onchange="saveWeight('${ex.id}', this.value)" class="w-full bg-slate-900 border border-slate-700 text-slate-100 text-xs px-2 py-1 rounded-lg focus:outline-none focus:border-emerald-500">
+                                </div>
+
+                                <p class="text-xs text-slate-300 leading-relaxed bg-slate-950/30 p-2.5 rounded-xl border border-slate-800/50 mb-4">
+                                    <strong class="text-emerald-400 block mb-0.5 font-medium text-[11px]">Dica do Personal:</strong>
+                                    ${ex.instructions}
+                                </p>
+                            </div>
+
+                            <button onclick="openVideoModal('${ex.title.replace(/'/g, "\\'")}', '${ex.videoId}', '${ex.youtubeQuery}', '${ex.instructions.replace(/'/g, "\\'")}')" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-xl transition flex items-center justify-center gap-2 border border-slate-700">
+                                <i class="ph ph-play-circle text-red-500 text-base"></i> Ver Execução em Vídeo
+                            </button>
+                        </div>
+                    `;
+                }).join('');
+            });
+        }
+
+        // Salvar Carga no LocalStorage
+        function saveWeight(id, value) {
+            exerciseWeights[id] = value;
+            localStorage.setItem('bruno_weights', JSON.stringify(exerciseWeights));
+        }
+
+        // Marcar Exercício Concluído
+        function toggleDone(id) {
+            completedExercises[id] = !completedExercises[id];
+            localStorage.setItem('bruno_completed_ex', JSON.stringify(completedExercises));
+            if (completedExercises[id]) {
+                showToast('Exercício Concluído!', 'Boa, Bruno! Um passo a mais para alcançar os 83kg!', 'ph-check-circle');
+            }
+            renderCards();
+        }
+
+        // Registrar Treino Concluído do Dia
+        function logTodayWorkout(workoutName) {
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('pt-BR') + ' às ' + now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+            
+            workoutHistory.unshift({ name: workoutName, date: dateStr });
+            localStorage.setItem('bruno_history', JSON.stringify(workoutHistory));
+            renderHistory();
+            showToast('Treino Concluído!', `Sensacional! "${workoutName}" registrado com sucesso.`, 'ph-fire');
+        }
+
+        // Renderizar Histórico no LocalStorage
+        function renderHistory() {
+            const container = document.getElementById('workoutHistoryList');
+            if (!container) return;
+
+            if (workoutHistory.length === 0) {
+                container.innerHTML = `<p class="text-slate-500 italic">Nenhum treino registrado ainda.</p>`;
+                return;
+            }
+
+            container.innerHTML = workoutHistory.map(item => `
+                <div class="flex items-center justify-between p-2.5 bg-slate-950/60 rounded-xl border border-slate-800">
+                    <span class="font-medium text-slate-200">${item.name}</span>
+                    <span class="text-slate-400 text-[11px]">${item.date}</span>
+                </div>
+            `).join('');
+        }
+
+        // Resetar Registros
+        document.getElementById('resetWorkoutBtn').addEventListener('click', () => {
+            if (confirm('Deseja limpar todos os registros salvos neste dispositivo?')) {
+                localStorage.removeItem('bruno_completed_ex');
+                localStorage.removeItem('bruno_weights');
+                localStorage.removeItem('bruno_history');
+                completedExercises = {};
+                exerciseWeights = {};
+                workoutHistory = [];
+                renderCards();
+                renderHistory();
+                showToast('Registros Limpos', 'Seu progresso salvo foi resetado com sucesso.', 'ph-trash');
+            }
+        });
+
+        // Modal de Vídeo
+        const videoModal = document.getElementById('videoModal');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const youtubeIframe = document.getElementById('youtubeIframe');
+
+        function openVideoModal(title, videoId, query, instruction) {
+            document.getElementById('modalVideoTitle').innerText = title;
+            document.getElementById('modalInstruction').innerText = instruction;
+            
+            youtubeIframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+            document.getElementById('youtubeExternalLink').href = `https://www.youtube.com/results?search_query=${query}`;
+
+            videoModal.classList.remove('hidden');
+        }
+
+        closeModalBtn.addEventListener('click', () => {
+            youtubeIframe.src = '';
+            videoModal.classList.add('hidden');
+        });
+
+        videoModal.addEventListener('click', (e) => {
+            if (e.target === videoModal) {
+                youtubeIframe.src = '';
+                videoModal.classList.add('hidden');
+            }
+        });
+
+        // Navegação de Abas
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const target = btn.getAttribute('data-tab');
+
+                tabBtns.forEach(b => {
+                    b.classList.remove('active', 'text-emerald-400', 'border-emerald-500');
+                    b.classList.add('text-slate-400', 'border-transparent');
+                });
+                tabContents.forEach(c => c.classList.add('hidden'));
+
+                btn.classList.add('active', 'text-emerald-400', 'border-emerald-500');
+                btn.classList.remove('text-slate-400', 'border-transparent');
+                
+                const activeContent = document.getElementById(target);
+                if (activeContent) activeContent.classList.remove('hidden');
+            });
+        });
+
+        // Session Timer (20 min)
+        let sessionTimer = null;
+        let sessionSeconds = 20 * 60;
+        let isSessionRunning = false;
+
+        const sessionDisplay = document.getElementById('sessionTimerDisplay');
+        const startSessionBtn = document.getElementById('startSessionBtn');
+        const pauseSessionBtn = document.getElementById('pauseSessionBtn');
+        const resetSessionBtn = document.getElementById('resetSessionBtn');
+
+        function updateSessionDisplay() {
+            const m = Math.floor(sessionSeconds / 60).toString().padStart(2, '0');
+            const s = (sessionSeconds % 60).toString().padStart(2, '0');
+            sessionDisplay.innerText = `${m}:${s}`;
+        }
+
+        startSessionBtn.addEventListener('click', () => {
+            if (isSessionRunning) return;
+            isSessionRunning = true;
+            startSessionBtn.classList.add('hidden');
+            pauseSessionBtn.classList.remove('hidden');
+
+            sessionTimer = setInterval(() => {
+                if (sessionSeconds > 0) {
+                    sessionSeconds--;
+                    updateSessionDisplay();
+                } else {
+                    clearInterval(sessionTimer);
+                    isSessionRunning = false;
+                    playAlarmSound();
+                    showToast('20 Minutos Concluídos!', 'Meta diária batida com sucesso! Você é imparável!', 'ph-crown');
+                }
+            }, 1000);
+        });
+
+        pauseSessionBtn.addEventListener('click', () => {
+            clearInterval(sessionTimer);
+            isSessionRunning = false;
+            pauseSessionBtn.classList.add('hidden');
+            startSessionBtn.classList.remove('hidden');
+        });
+
+        resetSessionBtn.addEventListener('click', () => {
+            clearInterval(sessionTimer);
+            isSessionRunning = false;
+            sessionSeconds = 20 * 60;
+            updateSessionDisplay();
+            pauseSessionBtn.classList.add('hidden');
+            startSessionBtn.classList.remove('hidden');
+        });
+
+        // Rest Timer
+        let restTimer = null;
+        let restSeconds = 45;
+        const restDisplay = document.getElementById('restTimerDisplay');
+
+        function startRest(seconds) {
+            clearInterval(restTimer);
+            restSeconds = seconds;
+            updateRestDisplay();
+
+            restTimer = setInterval(() => {
+                if (restSeconds > 0) {
+                    restSeconds--;
+                    updateRestDisplay();
+                } else {
+                    clearInterval(restTimer);
+                    playAlarmSound();
+                    showToast('Descanso Finalizado!', 'Hora da próxima série com garra total!', 'ph-barbell');
+                }
+            }, 1000);
+        }
+
+        function updateRestDisplay() {
+            const m = Math.floor(restSeconds / 60).toString().padStart(2, '0');
+            const s = (restSeconds % 60).toString().padStart(2, '0');
+            restDisplay.innerText = `${m}:${s}`;
+        }
+
+        document.getElementById('startRest45Btn').addEventListener('click', () => startRest(45));
+        document.getElementById('startRest30Btn').addEventListener('click', () => startRest(30));
+        document.getElementById('resetRestBtn').addEventListener('click', () => {
+            clearInterval(restTimer);
+            restSeconds = 45;
+            updateRestDisplay();
+        });
+
+        // Audio Feedback via Web Audio API
+        function playAlarmSound() {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(880, ctx.currentTime);
+                gain.gain.setValueAtTime(0.1, ctx.currentTime);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.5);
+            } catch (e) {
+                console.log('Audio not supported');
+            }
+        }
+
+        // Inicialização
+        window.onload = function() {
+            generateRandomQuote();
+            updateCycleProgress();
+            renderCards();
+            renderHistory();
+            updateSessionDisplay();
+            updateRestDisplay();
+        };
+    </script>
+</body>
+</html>
